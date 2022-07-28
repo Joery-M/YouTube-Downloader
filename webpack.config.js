@@ -61,8 +61,14 @@ module.exports = {
         filename: 'main.js',
         path: path.resolve(__dirname, 'app')
     },
-    plugins: [new HtmlWebpackPlugin({
-        template: "./src/index.html",
-        inject: "head"
-    })],
+    optimization: {
+        usedExports: true,
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: "./src/index.html",
+            inject: "head"
+        }),
+        new webpack.optimize.ModuleConcatenationPlugin()
+    ],
 };

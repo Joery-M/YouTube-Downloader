@@ -1,9 +1,15 @@
 import './index.html';
 import './stylesheet.scss';
 import './mdc.scss';
-import { ripple, linearProgress, textField, select, circularProgress, dialog } from 'material-components-web';
 import { Clipboard } from 'electron';
-import * as ytdl from 'ytdl-core';
+import { getInfoOptions, videoInfo } from 'ytdl-core';
+
+import { MDCCircularProgress } from "@material/circular-progress";
+import { MDCDialog, MDCDialogCloseEvent } from "@material/dialog";
+import { MDCLinearProgress } from "@material/linear-progress";
+import { MDCRipple } from "@material/ripple";
+import { MDCSelect } from "@material/select";
+import { MDCTextField } from "@material/textfield";
 
 //@ts-ignore
 var clipboard: Clipboard = window.clipboard;
@@ -11,7 +17,7 @@ var clipboard: Clipboard = window.clipboard;
 interface ElectronMain
 {
     validateURL: (string: string) => boolean;
-    getBasicInfo: (url: string, options?: ytdl.getInfoOptions | undefined) => Promise<ytdl.videoInfo>;
+    getBasicInfo: (url: string, options?: getInfoOptions | undefined) => Promise<videoInfo>;
     download: (...args: any[]) => void;
     onPercent: (ev: any) => void;
     doneDownload: (ev: any) => void;
@@ -29,11 +35,11 @@ document.addEventListener("DOMContentLoaded", () =>
     document.body.style.opacity = "1";
 });
 
-ripple.MDCRipple.attachTo(document.querySelector('#downloadButton'));
-const progress = new linearProgress.MDCLinearProgress(document.querySelector("#progressBar"));
-const textInput = new textField.MDCTextField(document.querySelector('#ytLink'));
-const selectList = new select.MDCSelect(document.querySelector('.mdc-select'));
-const iframeSpinner = new circularProgress.MDCCircularProgress(document.querySelector('.mdc-circular-progress'));
+MDCRipple.attachTo(document.querySelector('#downloadButton'));
+const progress = new MDCLinearProgress(document.querySelector("#progressBar"));
+const textInput = new MDCTextField(document.querySelector('#ytLink'));
+const selectList = new MDCSelect(document.querySelector('.mdc-select'));
+const iframeSpinner = new MDCCircularProgress(document.querySelector('.mdc-circular-progress'));
 iframeSpinner.determinate = false;
 (iframeSpinner.root as HTMLDivElement).style.display = "none";
 const downloadButton: HTMLInputElement = document.querySelector("#downloadButton");
@@ -44,8 +50,8 @@ downloadButton.addEventListener("click", download);
     preview(url)
 })
 
-const endMsg = new dialog.MDCDialog(document.querySelector('.mdc-dialog'));
-endMsg.listen("MDCDialog:closing", (ev: dialog.MDCDialogCloseEvent) =>
+const endMsg = new MDCDialog(document.querySelector('.mdc-dialog'));
+endMsg.listen("MDCDialog:closing", (ev: MDCDialogCloseEvent) =>
 {
     electron.dialogResponse(ev.detail.action == "accept");
 });

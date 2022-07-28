@@ -10,6 +10,8 @@ const cp = require('child_process');
 
 const ffmpegPath = require("ffmpeg-static-electron").path;
 
+require("./updater")
+
 function createWindow ()
 {
     var win = new BrowserWindow({
