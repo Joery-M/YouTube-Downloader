@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"outDir": "./app/",
+		"sourceMap": true,
+		"module": "esnext",
+		"target": "ESNext",
+		"moduleResolution": "node",
+		"alwaysStrict": true
+	},
+	"exclude": ["./app", "./dist"]
+}

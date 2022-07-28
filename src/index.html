@@ -1,0 +1,123 @@
+<!--
+    Auteur: Joery Münninghoff
+    Aanmaakdatum: 21/07/2022 12:05
+
+    Omschrijving: App 	
+-->
+
+<!DOCTYPE html>
+<html lang="nl">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	</head>
+	<body style="opacity: 0; overflow-y: hidden;">
+		<main>
+			<label class="mdc-text-field mdc-text-field--filled" id="ytLink">
+				<span class="mdc-floating-label">Video URL</span>
+				<input class="mdc-text-field__input" type="text" oninput="preview(this.value)" />
+				<span class="mdc-line-ripple"></span>
+			</label>
+			<div id="iframe">
+				<div class="mdc-circular-progress" style="width: 48px; height: 48px" role="progressbar" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1">
+					<div class="mdc-circular-progress__determinate-container">
+						<svg class="mdc-circular-progress__determinate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+							<circle class="mdc-circular-progress__determinate-track" cx="24" cy="24" r="18" stroke-width="4" />
+							<circle class="mdc-circular-progress__determinate-circle" cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="113.097" stroke-width="4" />
+						</svg>
+					</div>
+					<div class="mdc-circular-progress__indeterminate-container">
+						<div class="mdc-circular-progress__spinner-layer">
+							<div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-left">
+								<svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+									<circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549" stroke-width="4" />
+								</svg>
+							</div>
+							<div class="mdc-circular-progress__gap-patch">
+								<svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+									<circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549" stroke-width="3.2" />
+								</svg>
+							</div>
+							<div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-right">
+								<svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+									<circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549" stroke-width="4" />
+								</svg>
+							</div>
+						</div>
+					</div>
+				</div>
+				<iframe src="" frameborder="0" id="preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+			</div>
+			<div id="downloadOptions">
+				<div class="mdc-select mdc-select--filled demo-width-class" id="downloadType">
+					<div class="mdc-select__anchor" role="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="demo-label demo-selected-text">
+						<span id="demo-label" class="mdc-floating-label">Pick a download type</span>
+						<span class="mdc-select__selected-text-container">
+							<span id="demo-selected-text" class="mdc-select__selected-text"></span>
+						</span>
+						<span class="mdc-select__dropdown-icon">
+							<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+								<polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+								<polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+							</svg>
+						</span>
+						<span class="mdc-line-ripple"></span>
+					</div>
+
+					<div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
+						<ul class="mdc-list" role="listbox" aria-label="Video download type">
+							<li class="mdc-list-item mdc-list-item--selected" aria-selected="false" data-value="videoAudioLow" role="option">
+								<span class="mdc-list-item__ripple"></span>
+								<span class="mdc-list-item__text">Video + Audio</span>
+								<span class="mdc-list-item__secondary-text"> (Low quality, Fast)</span>
+							</li>
+							<li class="mdc-list-item" aria-selected="false" data-value="videoAudioHigh" role="option">
+								<span class="mdc-list-item__ripple"></span>
+								<span class="mdc-list-item__text">Video + Audio</span>
+								<span class="mdc-list-item__secondary-text"> (High quality, Slow)</span>
+							</li>
+							<li class="mdc-list-item" aria-selected="false" data-value="videoOnly" role="option">
+								<span class="mdc-list-item__ripple"></span>
+								<span class="mdc-list-item__text">Video only</span>
+							</li>
+							<li class="mdc-list-item" aria-selected="false" data-value="audioOnly" role="option">
+								<span class="mdc-list-item__ripple"></span>
+								<span class="mdc-list-item__text">Audio only</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<br />
+				<button class="mdc-button mdc-button--unelevated" id="downloadButton" disabled>
+					<div class="mdc-button__ripple"></div>
+					<span class="mdc-button__label">Download</span>
+				</button>
+				<br />
+				<div id="progressBar" class="mdc-linear-progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+					<div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+						<span class="mdc-linear-progress__bar-inner"></span>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<div class="mdc-dialog">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content">
+					<div class="mdc-dialog__content">Download done!</div>
+					<div class="mdc-dialog__actions">
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+							<div class="mdc-button__ripple"></div>
+							<span class="mdc-button__label">Close</span>
+						</button>
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept">
+							<div class="mdc-button__ripple"></div>
+							<span class="mdc-button__label">Open in <span id="FileSystem"></span></span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="mdc-dialog__scrim"></div>
+		</div>
+	</body>
+</html>

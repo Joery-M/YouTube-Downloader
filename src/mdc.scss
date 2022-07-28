@@ -1,0 +1,33 @@
+@use '@material/ripple/mdc-ripple';
+@use '@material/button/mdc-button';
+@use '@material/checkbox/mdc-checkbox';
+
+@use '@material/data-table/mdc-data-table';
+@use '@material/textfield/mdc-text-field';
+
+@use '@material/circular-progress/mdc-circular-progress';
+@use '@material/linear-progress/mdc-linear-progress';
+
+@use '@material/dialog/mdc-dialog';
+
+//? List
+@use "@material/list/mdc-list";
+@use "@material/menu-surface/mdc-menu-surface";
+@use "@material/menu/mdc-menu";
+@use "@material/select/styles";
+
+.mdc-text-field--focused:not(.mdc-text-field--disabled) .mdc-floating-label,
+.mdc-select:not(.mdc-select--disabled).mdc-select--focused .mdc-floating-label
+{
+    color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.mdc-dialog__button
+{
+    --mdc-theme-primary: #202124;
+    width: max-content;
+}
+.mdc-dialog__actions
+{
+    flex-direction: column-reverse;
+}

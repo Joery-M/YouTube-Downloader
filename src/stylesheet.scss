@@ -1,0 +1,90 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    --mdc-theme-primary: #ff0000;
+    --mdc-theme-secondary: #202020;
+    height: 100%;
+    padding: 0 3em;
+    margin: 0;
+
+    display: flex;
+    justify-content: center;
+
+    transition: 200ms opacity;
+    overflow-y: hidden;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: calc(100vh - 15px);
+    width: fit-content;
+}
+
+#downloadOptions {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+    justify-self: flex-end;
+}
+
+input {
+    width: 200px;
+}
+#ytLink {
+    width: 400px;
+    max-width: 61vw;
+    margin-top: 1em;
+}
+
+button {
+    color: white;
+    width: min-content;
+}
+
+button * {
+    transition: 200ms;
+    transition-property: background-color color;
+}
+
+#iframe {
+    margin: 1em;
+    aspect-ratio: 16/9;
+    max-width: calc(100vw - 2em);
+    flex: auto;
+}
+
+#preview {
+    transition: 200ms opacity;
+    opacity: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.mdc-circular-progress {
+    position: absolute !important;
+    left: calc(50% - 1em);
+    top: calc(50% - 4em);
+    z-index: 1;
+}
+
+.mdc-circular-progress * {
+    z-index: 1;
+}
+
+iframe * {
+    z-index: 2 !important;
+}
+
+#progressBar {
+    width: 200px;
+    background-color: lightgray;
+}
+
+#downloadType>div {
+    width: 216px;
+    min-width: max-content;
+}
