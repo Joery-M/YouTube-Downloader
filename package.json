@@ -11,7 +11,8 @@
     "watch": "webpack --watch --mode=development",
     "buildApp": "webpack --mode=production",
     "makeMac": "webpack --mode=production && electron-builder --mac",
-    "makeWin": "webpack --mode=production && electron-builder --win"
+    "makeWin": "webpack --mode=production && electron-builder --win",
+    "release": "electron-builder"
   },
   "keywords": [],
   "author": "Joery",
