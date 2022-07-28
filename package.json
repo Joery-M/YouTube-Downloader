@@ -5,12 +5,11 @@
   "description": "A standalone Youtube downloader",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron-forge start",
-    "make": "electron-builder -mwl",
+    "make": "webpack --mode=production && electron-builder -mwl",
     "watch": "webpack --watch --mode=development",
-    "makeMac": "electron-builder --mac",
-    "makeWin": "electron-builder --win"
+    "makeMac": "webpack --mode=production && electron-builder --mac",
+    "makeWin": "webpack --mode=production && electron-builder --win"
   },
   "keywords": [],
   "author": "Joery",
