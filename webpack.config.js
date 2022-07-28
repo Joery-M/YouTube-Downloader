@@ -38,7 +38,6 @@ module.exports = {
                 test: /\.s?[ac]ss$/i,
                 use: [
                     "style-loader",
-                    "cache-loader",
                     // Translates CSS into CommonJS
                     {
                         loader: "css-loader"
