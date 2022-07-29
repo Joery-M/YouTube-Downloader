@@ -1,6 +1,6 @@
 if (require('electron-squirrel-startup')) return app.quit();
 
-const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, shell, nativeTheme, webFrameMain } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const ytdl = require('ytdl-core');
@@ -10,7 +10,7 @@ const cp = require('child_process');
 
 const ffmpegPath = require("ffmpeg-static-electron").path;
 
-require("./updater")
+require("./updater");
 
 function createWindow ()
 {
@@ -26,7 +26,8 @@ function createWindow ()
         icon: process.platform == "darwin" ? "./icon.icns" : "./icon.ico",
         title: "YouTube Downloader",
         maxHeight: 820,
-        autoHideMenuBar: true
+        autoHideMenuBar: true,
+        transparent: true
     });
 
     win.loadFile('./app/index.html').then(() =>
@@ -51,6 +52,8 @@ function createWindow ()
     {
         win.webContents.send("winFocus");
     });
+
+    nativeTheme.themeSource = "system";
 }
 
 app.whenReady().then(() =>
@@ -121,7 +124,7 @@ ipcMain.on("download", async (ev, url, type) =>
                 return;
             }
             lastPercent = curPercent;
-            ev.sender.send("percent", curPercent);
+            sendPercent(curPercent);
         });
 
 
@@ -152,7 +155,12 @@ ipcMain.on("download", async (ev, url, type) =>
                     {
                         fs.rmSync(stream.path);
 
-                        win.webContents.send("doneDownload", true);
+                        if (!win.isFocused())
+                        {
+                            win.flashFrame(true);
+                        }
+
+                        doneDownload(true);
 
                         ipcMain.once("doneDialogRes", (ev, res) =>
                         {
@@ -165,35 +173,25 @@ ipcMain.on("download", async (ev, url, type) =>
                     })
                     .on("progress", (progress) =>
                     {
-                        ev.sender.send("percent", Math.round(progress.percent));
+                        sendPercent(Math.round(progress.percent));
                     })
                     .save(fileName);
-                var test = cp.spawn(ffmpeg, [], {
-                    windowsHide: true,
-                    stdio: [
-                        /* Standard: stdin, stdout, stderr */
-                        'inherit', 'inherit', 'inherit',
-                        /* Custom: pipe:3, pipe:4, pipe:5 */
-                        'pipe', 'pipe', 'pipe',
-                    ],
-                });
                 return;
             }
 
-            win.webContents.send("doneDownload", true);
+            doneDownload(true);
 
             ipcMain.once("doneDialogRes", (ev, res) =>
             {
                 if (res)
                 {
-                    var fileLoc = path.parse(fileName).dir;
-                    shell.openPath(fileLoc);
+                    shell.showItemInFolder(fileName);
                 }
             });
         });
     } else
     {
-        win.webContents.send("doneDownload");
+        doneDownload();
     }
 
 });
@@ -218,7 +216,7 @@ async function downloadVideoAndAudioHigh (ev, url, type, filters)
         function addToPercent (info)
         {
             doneBytes += info;
-            ev.sender.send("percent", Math.round(doneBytes / totalBytes * 100));
+            sendPercent(Math.round(doneBytes / totalBytes * 100));
         }
         function setMax (a, b, info3)
         {
@@ -254,33 +252,51 @@ async function downloadVideoAndAudioHigh (ev, url, type, filters)
                         fs.rmSync("./audio.mp3");
                         fs.rmSync("./video.mp4");
 
-                        win.webContents.send("doneDownload");
+                        doneDownload();
                     })
                     .on('end', function ()
                     {
                         fs.rmSync("./audio.mp3");
                         fs.rmSync("./video.mp4");
 
-                        win.webContents.send("doneDownload", true);
+                        doneDownload(true);
+
+                        if (!win.isFocused())
+                        {
+                            win.flashFrame(true);
+                        }
 
                         ipcMain.once("doneDialogRes", (ev, res) =>
                         {
                             if (res)
                             {
-                                var fileLoc = path.parse(fileName).dir;
-                                shell.openPath(fileLoc);
+                                shell.showItemInFolder(fileName);
                             }
                         });
                     })
                     .on("progress", (progress) =>
                     {
-                        ev.sender.send("percent", Math.round(progress.percent));
+                        sendPercent(Math.round(progress.percent));
                     })
                     .save(fileName);
             }
         }
     } else
     {
-        win.webContents.send("doneDownload");
+        doneDownload();
     }
+}
+
+function sendPercent (percent)
+{
+    var win = BrowserWindow.getAllWindows()[0];
+    win.webContents.send("percent", percent);
+    win.setProgressBar(percent / 100);
+}
+
+function doneDownload (isError)
+{
+    var win = BrowserWindow.getAllWindows()[0];
+    win.setProgressBar(0);
+    win.webContents.send("doneDownload", isError);
 }

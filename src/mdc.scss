@@ -14,12 +14,6 @@
 @use "@material/menu/mdc-menu";
 @use "@material/select/styles";
 
-.mdc-text-field--focused:not(.mdc-text-field--disabled) .mdc-floating-label,
-.mdc-select:not(.mdc-select--disabled).mdc-select--focused .mdc-floating-label
-{
-    color: rgba(0, 0, 0, 0.87) !important;
-}
-
 .mdc-dialog__button
 {
     --mdc-theme-primary: #202124;

@@ -23,6 +23,7 @@ interface ElectronMain
     doneDownload: (ev: any) => void;
     onFocus: (ev: any) => void;
     dialogResponse: (res: any) => void;
+    isDarkMode: () => boolean;
 }
 //@ts-ignore
 var electron: ElectronMain = window.electron;
@@ -33,6 +34,13 @@ var os: string = window.os;
 document.addEventListener("DOMContentLoaded", () =>
 {
     document.body.style.opacity = "1";
+
+    var text = clipboard.readText();
+    if (electron.validateURL(text) && textInput.value !== text)
+    {
+        textInput.value = text;
+        preview(text);
+    }
 });
 
 MDCRipple.attachTo(document.querySelector('#downloadButton'));
@@ -45,10 +53,11 @@ iframeSpinner.determinate = false;
 const downloadButton: HTMLInputElement = document.querySelector("#downloadButton");
 
 downloadButton.addEventListener("click", download);
-(document.querySelector("#ytLink input") as HTMLInputElement).addEventListener("input", (ev)=>{
-    var url = (document.querySelector("#ytLink input") as HTMLInputElement).value
-    preview(url)
-})
+(document.querySelector("#ytLink input") as HTMLInputElement).addEventListener("input", (ev) =>
+{
+    var url = (document.querySelector("#ytLink input") as HTMLInputElement).value;
+    preview(url);
+});
 
 const endMsg = new MDCDialog(document.querySelector('.mdc-dialog'));
 endMsg.listen("MDCDialog:closing", (ev: MDCDialogCloseEvent) =>
@@ -59,12 +68,6 @@ endMsg.listen("MDCDialog:closing", (ev: MDCDialogCloseEvent) =>
 
 const iframe = document.querySelector("iframe");
 
-var text = clipboard.readText();
-if (electron.validateURL(text) && textInput.value !== text)
-{
-    textInput.value = text;
-    preview(text);
-}
 electron.onFocus(() =>
 {
     var text = clipboard.readText();
@@ -105,22 +108,24 @@ async function preview (url: string)
     }
 }
 
-document.querySelector("#demo-selected-text").innerHTML += " (Low)";
+var listText = document.querySelector("#demo-selected-text");
+listText.innerHTML += " (Low)";
 
 document.querySelectorAll(".mdc-list-item").forEach((elem) =>
 {
     elem.addEventListener("click", () =>
     {
-        setTimeout(() =>
+        console.log("a");
+        listText.addEventListener('DOMSubtreeModified', () =>
         {
             if (selectList.selectedIndex == 0)
             {
-                document.querySelector("#demo-selected-text").innerHTML += " (Low)";
+                listText.innerHTML += " (Low)";
             } else if (selectList.selectedIndex == 1)
             {
-                document.querySelector("#demo-selected-text").innerHTML += " (High)";
+                listText.innerHTML += " (High)";
             }
-        }, 0);
+        }, { once: true });
     });
 });
 

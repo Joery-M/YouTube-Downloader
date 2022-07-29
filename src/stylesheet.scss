@@ -1,7 +1,102 @@
+:root{
+    --mdc-theme-primary: #df3727;
+}
+@media (prefers-color-scheme: dark) {
+
+    :root {
+
+        .mdc-floating-label {
+            color: rgba(0, 0, 0, 0.87) !important;
+        }
+
+        body {
+            --mdc-button-disabled-ink-color: #6f6f6f;
+            --mdc-button-outline-color: rgba(225, 225, 225, 0.12);
+            --mdc-radio-unchecked-color: rgba(33, 33, 33, 0.54);
+            --mdc-select-disabled-dropdown-icon-color: rgba(0, 0, 0, 0.37);
+            --mdc-select-disabled-fill-color: rgb(250, 250, 250);
+            --mdc-select-disabled-ink-color: rgba(0, 0, 0, 0.37);
+            --mdc-select-dropdown-icon-color: rgba(0, 0, 0, 0.54);
+            --mdc-select-fill-color: rgb(245, 245, 245);
+            --mdc-select-hover-line-color: rgba(0, 0, 0, 0.87);
+            --mdc-select-idle-line-color: rgba(0, 0, 0, 0.42);
+            --mdc-select-ink-color: rgba(0, 0, 0, 0.87);
+            --mdc-select-label-ink-color: rgba(0, 0, 0, 0.6);
+            --mdc-select-outlined-disabled-border-color: rgba(0, 0, 0, 0.06);
+            --mdc-select-outlined-hover-border-color: rgba(0, 0, 0, 0.87);
+            --mdc-select-outlined-idle-border-color: rgba(0, 0, 0, 0.38);
+            --mdc-text-field-disabled-fill-color: rgb(250, 250, 250);
+            --mdc-text-field-disabled-ink-color: rgba(0, 0, 0, 0.37);
+            --mdc-text-field-disabled-line-color: rgba(0, 0, 0, 0.06);
+            --mdc-text-field-fill-color: #1c1c1c;
+            --mdc-text-field-hover-line-color: rgba(0, 0, 0, 0.87);
+            --mdc-text-field-idle-line-color: rgba(0, 0, 0, 0.42);
+            --mdc-text-field-ink-color: rgba(0, 0, 0, 0.87);
+            --mdc-text-field-label-ink-color: rgba(0, 0, 0, 0.6);
+            --mdc-text-field-outlined-disabled-border-color: rgba(0, 0, 0, 0.06);
+            --mdc-text-field-outlined-hover-border-color: rgba(0, 0, 0, 0.87);
+            --mdc-text-field-outlined-idle-border-color: rgba(0, 0, 0, 0.38);
+            --mdc-theme-background: #111111;
+            --mdc-theme-error: #db4437;
+            --mdc-theme-on-primary: #ffffff;
+            --mdc-theme-on-secondary: #ffffff;
+            --mdc-theme-on-surface: #e1e1e1;
+            --mdc-theme-secondary: #ff9800;
+            --mdc-theme-surface: #1c1c1c;
+            --mdc-theme-text-disabled-on-light: #6f6f6f;
+            --mdc-theme-text-hint-on-background: #9b9b9b;
+            --mdc-theme-text-icon-on-background: #9b9b9b;
+            --mdc-theme-text-primary-on-background: #e1e1e1;
+            --mdc-theme-text-secondary-on-background: #9b9b9b;
+            background-color: #1c1c1c;
+
+            .mdc-text-field,
+            .mdc-select__anchor {
+                background-color: #282828 !important;
+
+                .mdc-floating-label {
+                    color: rgba(255, 255, 255, 0.6) !important;
+                }
+                .mdc-line-ripple::after {
+                    border-bottom-width: 2px;
+                }
+
+                &[aria-expanded="true"], &[class*="focused"]{
+                    .mdc-line-ripple::before {
+                        border-bottom-color: rgba(255, 255, 255, 0) !important;
+                    }
+                }
+                .mdc-line-ripple::before {
+                    background-color: rgba(255, 255, 255, 0.42);
+                    z-index: 100;
+                    transition: 100ms;
+                    transition-delay: 50ms;
+                }
+
+                &:hover {
+                    .mdc-line-ripple::before {
+                        border-bottom-color: rgba(255, 255, 255, 0.22);
+                    }
+
+                    // background-color: rgba(255, 255, 255, 0.62);
+                }
+
+                .mdc-text-field__input,
+                .mdc-select__selected-text {
+                    color: rgba(255, 255, 255, 0.87);
+                }
+            }
+
+            button[disabled] {
+                background-color: rgba(118, 118, 118, 0.3);
+                color: #ffffff20;
+            }
+        }
+    }
+}
+
 body {
     font-family: Arial, Helvetica, sans-serif;
-    --mdc-theme-primary: #ff0000;
-    --mdc-theme-secondary: #202020;
     height: 100%;
     padding: 0 3em;
     margin: 0;
@@ -9,7 +104,8 @@ body {
     display: flex;
     justify-content: center;
 
-    transition: 200ms opacity;
+    transition-duration: 500ms;
+    transition-property: opacity background-color;
     overflow-y: hidden;
 }
 
@@ -34,6 +130,7 @@ main {
 input {
     width: 200px;
 }
+
 #ytLink {
     width: 400px;
     max-width: 61vw;
@@ -52,7 +149,7 @@ button * {
 
 #iframe {
     margin: 1em;
-    aspect-ratio: 16/9;
+    aspect-ratio: 16 / 9;
     max-width: calc(100vw - 2em);
     flex: auto;
 }
