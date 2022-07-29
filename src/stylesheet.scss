@@ -91,6 +91,14 @@
                 background-color: rgba(118, 118, 118, 0.3);
                 color: #ffffff20;
             }
+
+            .mdc-dialog .mdc-dialog__title{
+                color: var(--mdc-theme-on-primary)
+            }
+            .mdc-dialog__actions button{
+                background-color: var(--mdc-button-outline-color);
+                color: white;
+            }
         }
     }
 }

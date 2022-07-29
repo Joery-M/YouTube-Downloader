@@ -1,7 +1,7 @@
 import './index.html';
 import './stylesheet.scss';
 import './mdc.scss';
-import { Clipboard } from 'electron';
+import { Clipboard, dialog } from 'electron';
 import { getInfoOptions, videoInfo } from 'ytdl-core';
 
 import { MDCCircularProgress } from "@material/circular-progress";
@@ -60,6 +60,7 @@ downloadButton.addEventListener("click", download);
 });
 
 const endMsg = new MDCDialog(document.querySelector('.mdc-dialog'));
+endMsg.open()
 endMsg.listen("MDCDialog:closing", (ev: MDCDialogCloseEvent) =>
 {
     electron.dialogResponse(ev.detail.action == "accept");
