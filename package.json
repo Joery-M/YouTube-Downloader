@@ -1,7 +1,7 @@
 {
   "name": "youtube-downloader",
   "productName": "YouTube Downloader",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A standalone Youtube downloader",
   "main": "index.js",
   "repository": "https://github.com/Joery-M/YouTube-Downloader",
