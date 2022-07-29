@@ -60,7 +60,6 @@ downloadButton.addEventListener("click", download);
 });
 
 const endMsg = new MDCDialog(document.querySelector('.mdc-dialog'));
-endMsg.open()
 endMsg.listen("MDCDialog:closing", (ev: MDCDialogCloseEvent) =>
 {
     electron.dialogResponse(ev.detail.action == "accept");
