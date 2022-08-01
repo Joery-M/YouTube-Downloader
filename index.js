@@ -35,6 +35,7 @@ function createWindow ()
         },
         icon: process.platform == "darwin" ? "./icon.icns" : "./icon.ico",
         title: "YouTube Downloader",
+        autoHideMenuBar: true,
         maxHeight: 820
     });
 
