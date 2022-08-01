@@ -3,11 +3,10 @@ const { doneDownload, sendPercent, ffmpegPath, ffprobePath } = require("../index
 // External modules
 const ytdl = require('ytdl-core');
 const YTDlpWrap = require('yt-dlp-wrap').default;
-const fs = require("fs");
-const ffmpeg = require("fluent-ffmpeg");
+const path = require("path");
 
 var ext = process.platform == "win32" ? ".exe" : "";
-const ytDlpWrap = new YTDlpWrap('./resources/yt-dlp' + ext);
+const ytDlpWrap = new YTDlpWrap(path.join(process.resourcesPath, "./yt-dlp" + ext));
 
 module.exports = async function download (url, quality)
 {

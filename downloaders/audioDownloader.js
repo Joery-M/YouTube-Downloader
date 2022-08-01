@@ -43,7 +43,7 @@ module.exports = async function download (url)
         return;
     }
     var ext = process.platform == "win32" ? ".exe" : "";
-    const ytDlpWrap = new YTDlpWrap('./resources/yt-dlp' + ext);
+    const ytDlpWrap = new YTDlpWrap(path.join(process.resourcesPath, "./yt-dlp" + ext));
 
     ytDlpWrap.exec([
         url,

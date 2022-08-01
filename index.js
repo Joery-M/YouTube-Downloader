@@ -8,33 +8,13 @@ const clipboardListener = require('clipboard-event');
 
 const ffmpeg = require('fluent-ffmpeg');
 const ytdl = require('ytdl-core');
-var ffmpegPath;
-var ffprobePath;
 
 if (process.platform == "darwin" && process.mainModule.filename.indexOf('app.asar') == -1) {
     app.disableHardwareAcceleration()
 }
 
-switch (process.platform)
-{
-    case 'win32':
-        ffmpegPath = path.join(process.cwd(), `./resources/ffmpeg/win/${process.arch}/ffmpeg.exe`);
-        ffprobePath = path.join(process.cwd(), `./resources/ffmpeg/win/${process.arch}/ffprobe.exe`);
-        break;
-    case 'darwin':
-        ffmpegPath = path.join(process.cwd(), `./resources/ffmpeg/mac/${process.arch}/ffmpeg`);
-        ffprobePath = path.join(process.cwd(), `./resources/ffmpeg/mac/${process.arch}/ffprobe`);
-        break;
-
-    default:
-        break;
-}
-
-if (!fs.existsSync(ffmpegPath))
-{
-    ffmpegPath = require("ffmpeg-static-electron").path.replace(/app\.asar(?!\.)/, "app.asar.unpacked");
-    ffprobePath = require("ffprobe-static-electron").path.replace(/app\.asar(?!\.)/, "app.asar.unpacked");
-}
+var ffmpegPath = require("ffmpeg-static-electron").path.replace(/app\.asar(?!\.)/, "app.asar.unpacked");
+var ffprobePath = require("ffprobe-static-electron").path.replace(/app\.asar(?!\.)/, "app.asar.unpacked");
 ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfprobePath(ffprobePath);
 
@@ -116,13 +96,9 @@ if (!gotTheLock)
 
         //? Download yt-dlp
         var ext = process.platform == "win32" ? ".exe" : "";
-        if (!fs.existsSync("./resources/yt-dlp" + ext))
+        if (!fs.existsSync(path.join(process.resourcesPath, "./yt-dlp" + ext)))
         {
-            if (!fs.existsSync("./resources/"))
-            {
-                fs.mkdirSync("./resources");
-            }
-            YTDlpWrap.downloadFromGithub('./resources/yt-dlp' + ext).then(() =>
+            YTDlpWrap.downloadFromGithub(path.join(process.resourcesPath, "./yt-dlp" + ext)).then(() =>
             {
             }).catch((err) =>
             {
