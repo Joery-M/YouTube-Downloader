@@ -1,7 +1,7 @@
 {
   "name": "youtube-downloader",
   "productName": "YouTube Downloader",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A standalone Youtube downloader",
   "main": "index.js",
   "repository": "https://github.com/Joery-M/YouTube-Downloader",
@@ -12,7 +12,7 @@
     "buildApp": "webpack --mode=production",
     "makeMac": "webpack --mode=production && electron-builder --mac",
     "makeWin": "webpack --mode=production && electron-builder --win",
-    "release": "electron-builder"
+    "release": "webpack --mode=production && electron-builder"
   },
   "keywords": [],
   "author": "Joery",
