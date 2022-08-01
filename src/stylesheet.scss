@@ -115,6 +115,7 @@ body {
     transition-duration: 500ms;
     transition-property: opacity background-color;
     overflow-y: hidden;
+    background-color: white;
 }
 
 main {
@@ -133,6 +134,13 @@ main {
     align-items: center;
 
     justify-self: flex-end;
+
+    >div{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1em;
+    }
 }
 
 input {
@@ -192,8 +200,4 @@ iframe * {
 #downloadType>div {
     width: 216px;
     min-width: max-content;
-}
-
-#downloadType{
-    margin-right: 1em;
 }

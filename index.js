@@ -11,6 +11,10 @@ const ytdl = require('ytdl-core');
 var ffmpegPath;
 var ffprobePath;
 
+if (process.platform == "darwin" && process.mainModule.filename.indexOf('app.asar') == -1) {
+    app.disableHardwareAcceleration()
+}
+
 switch (process.platform)
 {
     case 'win32':
@@ -51,9 +55,7 @@ function createWindow ()
         },
         icon: process.platform == "darwin" ? "./icon.icns" : "./icon.ico",
         title: "YouTube Downloader",
-        maxHeight: 820,
-        autoHideMenuBar: true,
-        transparent: true
+        maxHeight: 820
     });
 
     win.loadFile('./app/index.html').then(() =>
@@ -79,9 +81,12 @@ function createWindow ()
         win.webContents.send("clipboardChange");
     });
 
-    win.on("focus", () =>
-    {
-    });
+    if (process.platform == "darwin") {
+        win.on("focus", () =>
+        {
+            win.webContents.send("clipboardChange");
+        });
+    }
 
     nativeTheme.themeSource = "system";
 }

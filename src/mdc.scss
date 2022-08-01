@@ -14,15 +14,23 @@
 @use "@material/menu/mdc-menu";
 @use "@material/select/styles";
 
-.mdc-dialog__button
-{
+.mdc-dialog__button {
     --mdc-theme-primary: #202124;
     width: max-content;
 }
-.mdc-dialog__actions
-{
+
+.mdc-dialog__actions {
     flex-direction: column-reverse;
 }
-.mdc-select--disabled{
+
+.mdc-select--disabled {
     filter: contrast(0.8) brightness(0.7);
+}
+
+.mdc-select--focused .mdc-floating-label,
+.mdc-text-field--focused .mdc-floating-label {
+    color: rgba(0, 0, 0, 0.89) !important;
+}
+.mdc-select:not(.mdc-select--activated) .mdc-select__dropdown-icon {
+    fill: rgba(255, 255, 255, 0.54) !important;
 }
