@@ -14,3 +14,11 @@ YouTube doesn't store videos higher than 360p with audio, so this program combin
 ## Plans for the future
 - An option to only get a section of a video.
 - A direct resolution option.
+
+# How to build:
+ - Run `npm i`.
+ - To start using webpack watch, run `npm run watch`.
+ - To only build webpack (don't watch), run `npm run buildApp`.
+ - Run `npm start` to start electron-forge.
+ - Run `npm run makeWin` to make a Windows binary.
+ - Run `npm run makeMac` to make a Mac binary.
