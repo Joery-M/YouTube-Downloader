@@ -6,9 +6,6 @@ const path = require('path');
 const YTDlpWrap = require('yt-dlp-wrap').default;
 const clipboardListener = require('clipboard-event');
 
-var ext = process.platform == "win32" ? ".exe" : "";
-const ytDlpWrap = new YTDlpWrap('./resources/yt-dlp' + ext);
-
 const ffmpeg = require('fluent-ffmpeg');
 const ytdl = require('ytdl-core');
 var ffmpegPath;
@@ -202,7 +199,7 @@ function sendPercent (percent)
 function doneDownload (isError)
 {
     var win = BrowserWindow.getAllWindows()[0];
-    win.setProgressBar(0);
+    win.setProgressBar(-1);
     win.webContents.send("doneDownload", isError);
 }
 module.exports = {
