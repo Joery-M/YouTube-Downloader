@@ -2,3 +2,4 @@
 /dist/*
 app/*
 /electron-builder.env
+/resources

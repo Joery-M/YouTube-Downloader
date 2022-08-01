@@ -1,19 +1,48 @@
 if (require('electron-squirrel-startup')) return app.quit();
 
-const { app, BrowserWindow, dialog, ipcMain, shell, nativeTheme, webFrameMain } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeTheme, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
-const ytdl = require('ytdl-core');
+const YTDlpWrap = require('yt-dlp-wrap').default;
+const clipboardListener = require('clipboard-event');
+
+var ext = process.platform == "win32" ? ".exe" : "";
+const ytDlpWrap = new YTDlpWrap('./resources/yt-dlp' + ext);
 
 const ffmpeg = require('fluent-ffmpeg');
-const cp = require('child_process');
+const ytdl = require('ytdl-core');
+var ffmpegPath;
+var ffprobePath;
 
-const ffmpegPath = require("ffmpeg-static-electron").path;
+switch (process.platform)
+{
+    case 'win32':
+        ffmpegPath = path.join(process.cwd(), `./resources/ffmpeg/win/${process.arch}/ffmpeg.exe`);
+        ffprobePath = path.join(process.cwd(), `./resources/ffmpeg/win/${process.arch}/ffprobe.exe`);
+        break;
+    case 'darwin':
+        ffmpegPath = path.join(process.cwd(), `./resources/ffmpeg/mac/${process.arch}/ffmpeg`);
+        ffprobePath = path.join(process.cwd(), `./resources/ffmpeg/mac/${process.arch}/ffprobe`);
+        break;
+
+    default:
+        break;
+}
+
+if (!fs.existsSync(ffmpegPath))
+{
+    ffmpegPath = require("ffmpeg-static-electron").path.replace(/app\.asar(?!\.)/, "app.asar.unpacked");
+    ffprobePath = require("ffprobe-static-electron").path.replace(/app\.asar(?!\.)/, "app.asar.unpacked");
+}
+ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath);
 
 require("./updater");
 
 function createWindow ()
 {
+    clipboardListener.startListening();
+
     var win = new BrowserWindow({
         width: 800,
         height: 652,
@@ -48,244 +77,120 @@ function createWindow ()
     });
     win.setAspectRatio(1.2071651090342679);
 
+    clipboardListener.on('change', () =>
+    {
+        win.webContents.send("clipboardChange");
+    });
+
     win.on("focus", () =>
     {
-        win.webContents.send("winFocus");
     });
 
     nativeTheme.themeSource = "system";
 }
 
-app.whenReady().then(() =>
-{
-    createWindow();
+const gotTheLock = app.requestSingleInstanceLock();
 
-    app.on('activate', () =>
+if (!gotTheLock)
+{
+    app.quit();
+} else
+{
+    app.on('second-instance', () =>
     {
-        if (BrowserWindow.getAllWindows().length === 0)
+        // Someone tried to run a second instance, we should focus our window.
+        var myWindow = BrowserWindow.getAllWindows()[0]
+        if (myWindow)
         {
-            createWindow();
+            if (myWindow.isMinimized()) myWindow.restore();
+            myWindow.focus();
         }
     });
-});
+
+    // Create myWindow, load the rest of the app, etc...
+    app.whenReady().then(() =>
+    {
+        createWindow();
+
+        //? Download yt-dlp
+        var ext = process.platform == "win32" ? ".exe" : "";
+        if (!fs.existsSync("./resources/yt-dlp" + ext))
+        {
+            if (!fs.existsSync("./resources/"))
+            {
+                fs.mkdirSync("./resources");
+            }
+            YTDlpWrap.downloadFromGithub('./resources/yt-dlp' + ext).then(() =>
+            {
+            }).catch((err) =>
+            {
+                console.log(err.statusMessage);
+                dialog.showErrorBox("An error occured downloading yt-dlp!", err.statusCode + ": " + err.statusMessage);
+            });
+        }
+
+        app.on('activate', () =>
+        {
+            if (BrowserWindow.getAllWindows().length === 0)
+            {
+                createWindow();
+            }
+        });
+    });
+}
 
 app.on('window-all-closed', () =>
 {
     app.quit();
 });
 
-ipcMain.on("download", async (ev, url, type) =>
+ipcMain.on("download", async (ev, url, type, quality) =>
 {
-    var options = {};
-    var filters = [
-        { name: ".mp4", extensions: ["mp4"] },
-    ];
-    var win = BrowserWindow.getAllWindows()[0];
     if (type == "audioOnly")
     {
-        options = { filter: 'audioonly', quality: "highestaudio" };
-        filters = [
-            { name: ".mp3", extensions: ["mp3"] },
-            { name: ".wav", extensions: ["wav"] },
-            { name: ".aac", extensions: ["aac"] },
-            { name: ".aiff", extensions: ["aiff"] },
-            { name: ".flac", extensions: ["flac"] },
-            { name: ".m4a", extensions: ["m4a"] },
-            { name: ".ogg, .oga, .mogg", extensions: ["ogg", "oga", "mogg"] },
-            { name: ".opus", extensions: ["opus"] },
-            { name: ".wma", extensions: ["wma"] },
-            { name: ".webm", extensions: ["webm"] }
-        ];
+        require("./downloaders/audioDownloader")(url);
     } else if (type == "videoOnly")
     {
-        options = { quality: "highestvideo", filter: 'videoonly' };
-    } else if (type == "videoAudioHigh")
+        require("./downloaders/videoDownloader")(url, quality);
+    } else if (type == "videoAudio")
     {
-        downloadVideoAndAudioHigh(ev, url, type, filters);
+        require("./downloaders/VAdownloader")(url, quality);
         return;
-    }
-    var videoName = (await ytdl.getBasicInfo(url)).videoDetails.title;
-    var fileName = dialog.showSaveDialogSync(win, {
-        title: 'Download to File…',
-        defaultPath: videoName.replace(/[/\\?%*:|"<>]/g, ''),
-        filters: filters
-    });
-
-    if (fileName)
-    {
-        const video = ytdl(url, options);
-
-        var lastPercent;
-        video.on('progress', async function (info, info2, info3)
-        {
-            var curPercent = Math.round((info2 / info3) * 100);
-            if (lastPercent == curPercent)
-            {
-                return;
-            }
-            lastPercent = curPercent;
-            sendPercent(curPercent);
-        });
-
-
-        if (type == "audioOnly")
-        {
-            var stream = fs.createWriteStream("./video.mp3");
-        } else
-        {
-            var stream = fs.createWriteStream(fileName);
-        }
-
-        video.pipe(stream).on("finish", () =>
-        {
-            if (type == "audioOnly")
-            {
-                var ext = path.parse(fileName).ext;
-                var extNoDot = ext.replace(".", "");
-                ffmpeg(stream.path)
-                    .setFfmpegPath(ffmpegPath)
-                    .toFormat(extNoDot)
-                    .on('error', (error) =>
-                    {
-                        console.log(error);
-
-                        fs.rmSync(stream.path);
-                    })
-                    .on("end", () =>
-                    {
-                        fs.rmSync(stream.path);
-
-                        if (!win.isFocused())
-                        {
-                            win.flashFrame(true);
-                        }
-
-                        doneDownload(true);
-
-                        ipcMain.once("doneDialogRes", (ev, res) =>
-                        {
-                            if (res)
-                            {
-                                var fileLoc = path.parse(fileName).dir;
-                                shell.openPath(fileLoc);
-                            }
-                        });
-                    })
-                    .on("progress", (progress) =>
-                    {
-                        sendPercent(Math.round(progress.percent));
-                    })
-                    .save(fileName);
-                return;
-            }
-
-            doneDownload(true);
-
-            ipcMain.once("doneDialogRes", (ev, res) =>
-            {
-                if (res)
-                {
-                    shell.showItemInFolder(fileName);
-                }
-            });
-        });
-    } else
-    {
-        doneDownload();
     }
 
 });
 
-async function downloadVideoAndAudioHigh (ev, url, type, filters)
+ipcMain.on("getFormats", async (ev, url) =>
 {
-    var win = BrowserWindow.getAllWindows()[0];
-    var videoName = (await ytdl.getBasicInfo(url)).videoDetails.title;
-    var fileName = dialog.showSaveDialogSync(win, {
-        title: 'Download to File…',
-        defaultPath: videoName.replace(/[/\\?%*:|"<>]/g, '-'),
-        filters: filters
+    var formatList = [];
+
+    ytdl.getInfo(url).then((info) =>
+    {
+        var formats = info.formats.filter((format) =>
+        {
+            return format.hasVideo && !format.hasAudio && !format.isDashMPD && !format.videoCodec.includes("avc1") && !format.videoCodec.includes("av01");
+        });
+        formats = formats.sort((a, b) =>
+        {
+            var aHDR = parseFloat(a.colorInfo.primaries.replace("COLOR_PRIMARIES_BT", ""));
+            var bHDR = parseFloat(b.colorInfo.primaries.replace("COLOR_PRIMARIES_BT", ""));
+            var aQ = parseFloat(a.bitrate);
+            var bQ = parseFloat(b.bitrate);
+            return bHDR - aHDR || bQ - aQ;
+        });
+        formats.forEach((format) =>
+        {
+            formatList.push({
+                format: format.container,
+                resolution: format.qualityLabel.replace(/p.*/, "p"),
+                fps: format.fps,
+                hdr: format.qualityLabel.includes("HDR")
+            });
+        });
+        ev.sender.send("vidFormats", formatList);
     });
 
-    if (fileName)
-    {
-        var audioStream = ytdl(url, { filter: 'audioonly', quality: "highestaudio" });
-        var videoStream = ytdl(url, { filter: 'videoonly', quality: "highestvideo" });
-        var totalBytes = 0;
-        var doneBytes = 0;
-
-        function addToPercent (info)
-        {
-            doneBytes += info;
-            sendPercent(Math.round(doneBytes / totalBytes * 100));
-        }
-        function setMax (a, b, info3)
-        {
-            totalBytes += info3;
-        }
-        audioStream.once("progress", setMax);
-        videoStream.once("progress", setMax);
-        audioStream.on("progress", addToPercent);
-        videoStream.on("progress", addToPercent);
-
-        audioStream.pipe(fs.createWriteStream("./audio.mp3")).on("finish", checkExport);
-        videoStream.pipe(fs.createWriteStream("./video.mp4")).on("finish", checkExport);
-
-        var amtDone = 0;
-        async function checkExport ()
-        {
-            amtDone++;
-            if (amtDone == 2)
-            {
-                let ext = path.parse(fileName).ext.replace(".", "");
-
-                ffmpeg()
-                    .setFfmpegPath(ffmpegPath)
-                    .addInput(`./video.mp4`)
-                    .addInput(`./audio.mp3`)
-                    .videoCodec(process.platform == "darwin" ? "mpeg4" : "copy")
-                    .audioCodec("aac")
-                    .toFormat(ext)
-                    .on('error', (error, stdout, stderr) =>
-                    {
-                        console.log(stderr);
-
-                        fs.rmSync("./audio.mp3");
-                        fs.rmSync("./video.mp4");
-
-                        doneDownload();
-                    })
-                    .on('end', function ()
-                    {
-                        fs.rmSync("./audio.mp3");
-                        fs.rmSync("./video.mp4");
-
-                        doneDownload(true);
-
-                        if (!win.isFocused())
-                        {
-                            win.flashFrame(true);
-                        }
-
-                        ipcMain.once("doneDialogRes", (ev, res) =>
-                        {
-                            if (res)
-                            {
-                                shell.showItemInFolder(fileName);
-                            }
-                        });
-                    })
-                    .on("progress", (progress) =>
-                    {
-                        sendPercent(Math.round(progress.percent));
-                    })
-                    .save(fileName);
-            }
-        }
-    } else
-    {
-        doneDownload();
-    }
-}
+});
 
 function sendPercent (percent)
 {
@@ -300,3 +205,9 @@ function doneDownload (isError)
     win.setProgressBar(0);
     win.webContents.send("doneDownload", isError);
 }
+module.exports = {
+    sendPercent,
+    doneDownload,
+    ffmpegPath,
+    ffprobePath
+};

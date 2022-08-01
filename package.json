@@ -1,14 +1,14 @@
 {
   "name": "youtube-downloader",
   "productName": "YouTube Downloader",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "A standalone Youtube downloader",
   "main": "index.js",
   "repository": "https://github.com/Joery-M/YouTube-Downloader",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "env YTDL_NO_UPDATE=1 electron-forge start",
     "make": "webpack --mode=production && electron-builder -mwl",
-    "watch": "webpack --watch --mode=development",
+    "watch": "webpack --watch --mode=development --devtool=inline-source-map",
     "buildApp": "webpack --mode=production",
     "makeMac": "webpack --mode=production && electron-builder --mac",
     "makeWin": "webpack --mode=production && electron-builder --win",
@@ -24,16 +24,23 @@
     "@material/ripple": "^14.0.0",
     "@material/select": "^14.0.0",
     "@material/textfield": "^14.0.0",
+    "clipboard-event": "^1.5.0",
     "electron-progressbar": "^2.0.1",
     "electron-squirrel-startup": "^1.0.0",
     "electron-updater": "^5.0.5",
     "ffmpeg-static-electron": "^2.0.3",
+    "ffprobe-static-electron": "^2.0.2",
     "fluent-ffmpeg": "^2.1.2",
     "node-fetch": "^2.6.7",
+    "yt-dlp-wrap": "^2.3.11",
     "ytdl-core": "^4.11.0"
   },
   "build": {
     "appId": "Youtube.Downloader",
+    "asarUnpack": [
+      "node_modules/ffmpeg-static-electron",
+      "node_modules/ffprobe-static-electron"
+    ],
     "win": {
       "publish": [
         "github"

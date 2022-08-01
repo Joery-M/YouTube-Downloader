@@ -23,3 +23,6 @@
 {
     flex-direction: column-reverse;
 }
+.mdc-select--disabled{
+    filter: contrast(0.8) brightness(0.7);
+}

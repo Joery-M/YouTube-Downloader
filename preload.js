@@ -10,8 +10,17 @@ contextBridge.exposeInMainWorld(
         download: (...args) => ipcRenderer.send("download", ...args),
         onPercent: (ev) => { ipcRenderer.on("percent", ev); },
         doneDownload: (ev) => { ipcRenderer.on("doneDownload", ev); },
-        onFocus: (ev) => { ipcRenderer.on("winFocus", ev); },
+        onClipboard: (ev) => { ipcRenderer.on("clipboardChange", ev); },
         dialogResponse: (res) => ipcRenderer.send("doneDialogRes", res),
+        barDeterminate: (func)=>{ipcRenderer.on("barIndeterminate", func)},
+        getFormats: (url) =>{
+            return new Promise((resolve, reject) => {
+                ipcRenderer.send("getFormats", url)
+                ipcRenderer.on("vidFormats", (ev, formats)=>{
+                    resolve(formats)
+                })
+            });
+        }
     }
 );
 contextBridge.exposeInMainWorld('clipboard', clipboard);
