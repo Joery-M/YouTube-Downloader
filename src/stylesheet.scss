@@ -1,6 +1,13 @@
-:root{
+:root {
     --mdc-theme-primary: #df3727;
+    --mdc-theme-secondary: #f5f5f5;
+    --mdc-theme-on-secondary: #1c1c1c;
+    --mdc-ripple-focus-opacity: 0;
+    --mdc-filled-button-pressed-state-layer-opacity: 0 !important;
+    --mdc-text-button-pressed-state-layer-opacity: 0 !important;
+    --mdc-checkbox-checked-color: #1c1c1c;
 }
+
 @media (prefers-color-scheme: dark) {
 
     :root {
@@ -41,7 +48,7 @@
             --mdc-theme-on-primary: #ffffff;
             --mdc-theme-on-secondary: #ffffff;
             --mdc-theme-on-surface: #e1e1e1;
-            --mdc-theme-secondary: #ff9800;
+            --mdc-theme-secondary: #262626;
             --mdc-theme-surface: #1c1c1c;
             --mdc-theme-text-disabled-on-light: #6f6f6f;
             --mdc-theme-text-hint-on-background: #9b9b9b;
@@ -57,15 +64,18 @@
                 .mdc-floating-label {
                     color: rgba(255, 255, 255, 0.6) !important;
                 }
+
                 .mdc-line-ripple::after {
                     border-bottom-width: 2px;
                 }
 
-                &[aria-expanded="true"], &[class*="focused"]{
+                &[aria-expanded="true"],
+                &[class*="focused"] {
                     .mdc-line-ripple::before {
                         border-bottom-color: rgba(255, 255, 255, 0) !important;
                     }
                 }
+
                 .mdc-line-ripple::before {
                     background-color: rgba(255, 255, 255, 0.42);
                     z-index: 100;
@@ -89,13 +99,14 @@
 
             button[disabled] {
                 background-color: rgba(118, 118, 118, 0.3);
-                color: #ffffff20;
+                color: #ffffff40 !important;
             }
 
-            .mdc-dialog .mdc-dialog__title{
+            .mdc-dialog .mdc-dialog__title {
                 color: var(--mdc-theme-on-primary)
             }
-            .mdc-dialog__actions button{
+
+            .mdc-dialog__actions button {
                 background-color: var(--mdc-button-outline-color);
                 color: white;
             }
@@ -106,16 +117,31 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
     height: 100%;
-    padding: 0 3em;
     margin: 0;
 
-    display: flex;
-    justify-content: center;
-
     transition-duration: 500ms;
-    transition-property: opacity background-color;
-    overflow-y: hidden;
+    transition-property: opacity, background-color;
+    overflow: hidden;
     background-color: white;
+}
+
+#fileCatcher{
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    pointer-events: none;
+    background-color: rgba(118, 118, 118, 0.3);
+    transition: 250ms opacity;
+    opacity: 0;
+}
+#fileCatcher.droppable{
+    pointer-events: all;
+    opacity: 1;
+}
+
+video::-webkit-media-controls-fullscreen-button {
+    display: none !important;
 }
 
 main {
@@ -123,8 +149,22 @@ main {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    height: calc(100vh - 15px);
-    width: fit-content;
+    height: calc(100vh - 15px - calc(48px + 1em));
+    width: 50%;
+    padding: 0 3em;
+}
+
+#wrapper {
+    width: 200%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    transition: 500ms transform cubic-bezier(0, 0, 0, 1);
+    padding-top: calc(48px + 1em) !important;
+}
+
+#wrapper.slide {
+    transform: translateX(-50%);
 }
 
 #downloadOptions {
@@ -135,7 +175,7 @@ main {
 
     justify-self: flex-end;
 
-    >div{
+    >div {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
@@ -147,20 +187,27 @@ input {
     width: 200px;
 }
 
+.mdc-button__ripple::after,
+.mdc-button__ripple::before {
+    transition: 250ms !important;
+}
+
 #ytLink {
     width: 400px;
     max-width: 61vw;
     margin-top: 1em;
 }
 
-button {
-    color: white;
-    width: min-content;
-}
+#downloadPage {
+    button {
+        color: white;
+        width: min-content;
+    }
 
-button * {
-    transition: 200ms;
-    transition-property: background-color color;
+    button * {
+        transition: 200ms;
+        transition-property: background-color color;
+    }
 }
 
 #iframe {
@@ -168,6 +215,18 @@ button * {
     aspect-ratio: 16 / 9;
     max-width: calc(100vw - 2em);
     flex: auto;
+    display: flex;
+
+    .mdc-circular-progress {
+        position: absolute !important;
+        left: calc(50vw - 24px);
+        align-self: center;
+        z-index: 1;
+    }
+
+    .mdc-circular-progress * {
+        z-index: 1;
+    }
 }
 
 #preview {
@@ -177,22 +236,18 @@ button * {
     width: 100%;
 }
 
-.mdc-circular-progress {
-    position: absolute !important;
-    left: calc(50% - 1em);
-    top: calc(50% - 4em);
-    z-index: 1;
+.mdc-text-field,
+.mdc-select__anchor {
+    transition: background 500ms;
 }
 
-.mdc-circular-progress * {
-    z-index: 1;
+iframe {
+    * {
+        z-index: 2 !important;
+    }
 }
 
-iframe * {
-    z-index: 2 !important;
-}
-
-#progressBar {
+#progressBar, #progressBarConvert {
     width: 200px;
     background-color: lightgray;
 }
@@ -200,4 +255,46 @@ iframe * {
 #downloadType>div {
     width: 216px;
     min-width: max-content;
+}
+
+
+
+//? Converter page
+#convertPage {
+    display: flex;
+    flex-wrap: wrap;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2em;
+
+    #previewVid {
+        aspect-ratio: 16/9;
+
+        filter: opacity(1);
+        width: 800px;
+        max-width: 61vw;
+    }
+
+    #openVideo {
+        margin-top: 1em;
+    }
+
+    #convertVideo{
+        margin-bottom: 1em;
+    }
+
+    >div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .mdc-form-field {
+        margin-bottom: 1em;
+        >*:not(label) {
+            margin-left: 1em;
+        }
+    }
 }

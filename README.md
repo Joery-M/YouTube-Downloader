@@ -12,6 +12,7 @@ Options:
 - An option to only get a section of a video.
 - ~~A direct resolution option.~~
 - ~~Dark mode.~~
+- ~~A converter to convert MKV/Webm to mp4~~
 
 # How to build:
  - Run `npm i`.

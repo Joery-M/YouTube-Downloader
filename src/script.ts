@@ -1,6 +1,7 @@
 import './index.html';
 import './stylesheet.scss';
 import './mdc.scss';
+import './convert';
 import { Clipboard } from 'electron';
 import { getInfoOptions, videoInfo } from 'ytdl-core';
 
@@ -10,6 +11,8 @@ import { MDCLinearProgress } from "@material/linear-progress";
 import { MDCRipple } from "@material/ripple";
 import { MDCSelect } from "@material/select";
 import { MDCTextField } from "@material/textfield";
+import { MDCTabBar } from '@material/tab-bar';
+import { MDCTopAppBar } from '@material/top-app-bar';
 
 //@ts-ignore
 var clipboard: Clipboard = window.clipboard;
@@ -20,9 +23,11 @@ interface formatList
     resolution: string;
     fps: string | number;
     hdr: boolean;
+    size?: number;
+    audioSize?: number
 }
 
-interface ElectronMain
+interface DownloaderInterface
 {
     validateURL: (string: string) => boolean;
     getBasicInfo: (url: string, options?: getInfoOptions | undefined) => Promise<videoInfo>;
@@ -36,22 +41,29 @@ interface ElectronMain
     getFormats: (url: any) => Promise<formatList[]>;
 }
 //@ts-ignore
-var electron: ElectronMain = window.electron;
+var downloader: DownloaderInterface = window.downloader;
 
 //@ts-ignore
 var os: string = window.os;
+
+document.querySelector("#FileSystem").innerHTML = os == "darwin" ? "Finder" : "File Explorer";
 
 document.addEventListener("DOMContentLoaded", () =>
 {
     document.body.style.opacity = "1";
 
     var text = clipboard.readText();
-    if (electron.validateURL(text) && textInput.value !== text)
+    if (downloader.validateURL(text) && textInput.value !== text)
     {
         textInput.value = text;
         preview(text);
     }
 });
+
+
+export const tabBar = new MDCTabBar(document.querySelector('.mdc-tab-bar'));
+const topAppBarElement = document.querySelector('.mdc-top-app-bar');
+const topAppBar = new MDCTopAppBar(topAppBarElement);
 
 MDCRipple.attachTo(document.querySelector('#downloadButton'));
 const progress = new MDCLinearProgress(document.querySelector("#progressBar"));
@@ -62,7 +74,7 @@ qualityList.disabled = true;
 const iframeSpinner = new MDCCircularProgress(document.querySelector('.mdc-circular-progress'));
 iframeSpinner.determinate = false;
 (iframeSpinner.root as HTMLDivElement).style.display = "none";
-const downloadButton: HTMLInputElement = document.querySelector("#downloadButton");
+const downloadButton: HTMLButtonElement = document.querySelector("#downloadButton");
 
 downloadButton.addEventListener("click", download);
 (document.querySelector("#ytLink input") as HTMLInputElement).addEventListener("input", (ev) =>
@@ -71,21 +83,20 @@ downloadButton.addEventListener("click", download);
     preview(url);
 });
 
-const endMsg = new MDCDialog(document.querySelector('.mdc-dialog'));
+export const endMsg = new MDCDialog(document.querySelector('.mdc-dialog'));
 endMsg.listen("MDCDialog:closing", (ev: MDCDialogCloseEvent) =>
 {
-    electron.dialogResponse(ev.detail.action == "accept");
+    downloader.dialogResponse(ev.detail.action == "accept");
 });
-
 
 const iframe = document.querySelector("iframe");
 
-electron.onClipboard(() =>
+downloader.onClipboard(() =>
 {
     var text = clipboard.readText();
     setTimeout(() =>
     {
-        if (electron.validateURL(text) && textInput.value !== text)
+        if (downloader.validateURL(text) && textInput.value !== text)
         {
             textInput.value = text;
             preview(text);
@@ -95,14 +106,17 @@ electron.onClipboard(() =>
 
 async function preview (url: string)
 {
-    if (electron.validateURL(url))
+    if (downloader.validateURL(url))
     {
+        //? Move tab
+        tabBar.activateTab(0)
+
         qualityList.disabled = true;
-        downloadButton.disabled = true
+        downloadButton.disabled = true;
         iframe.style.opacity = "0";
         (iframeSpinner.root as HTMLDivElement).style.display = "initial";
-        var info = await electron.getBasicInfo(url);
-        console.log(info);
+
+        var info = await downloader.getBasicInfo(url);
 
         iframe.src = "https://www.youtube.com/embed/" + info.player_response.videoDetails.videoId + "?rel=0";
 
@@ -117,24 +131,34 @@ async function preview (url: string)
                     resolve();
                 }
             }, { once: true });
-            electron.getFormats(url).then((list) =>
+            downloader.getFormats(url).then((list) =>
             {
+                if (list.length == 0)
+                {
+                    (iframeSpinner.root as HTMLDivElement).style.display = "none";
+                    return;
+                }
+
+                var Audiosize = parseFloat(list[0].audioSize.toString()) ?? 0;
                 var listElem = qualityList.root.querySelector(".mdc-list");
                 listElem.innerHTML = "";
                 list.forEach((format, i) =>
                 {
+                    var combinedSize = parseFloat(format.size.toString() ?? "0") + Audiosize
+                    var size = format.size ? `<span class="sizeWithoutAudio" style="display:none;">${bytesToSize(format.size)}</span> <span class="sizeWithAudio">${bytesToSize(combinedSize)}</span>` : "";
                     listElem.innerHTML +=
                         `
                     <li class="mdc-list-item" aria-selected="false" data-value="${format.format}:${format.resolution}:${format.fps}:${format.hdr}" role="option">
                         <span class="mdc-list-item__ripple"></span>
                         <span class="mdc-list-item__text">${format.resolution}</span>
-                        <span class="mdc-list-item__secondary-text">&nbsp;${format.fps}fps${format.hdr ? ", HDR" : ""}</span>
+                        <span class="mdc-list-item__secondary-text">${format.fps}fps${format.hdr ? ", HDR" : ""}</span>
+                        <span class="mdc-list-item__secondary-text">${size}</span>
                     </li>
                     `;
                 });
                 qualityList.layoutOptions();
                 qualityList.setSelectedIndex(0);
-                qualityList.setValue(`${list[0].format}:${list[0].resolution}:${list[0].fps}:${list[0].hdr}`)
+                qualityList.setValue(`${list[0].format}:${list[0].resolution}:${list[0].fps}:${list[0].hdr}`);
                 if (selectList.selectedIndex < 2)
                 {
                     qualityList.disabled = false;
@@ -167,9 +191,30 @@ async function preview (url: string)
 
 selectList.listen("MDCSelect:change", () =>
 {
+    if (downloadButton.disabled)
+    {
+        return;
+    }
     if (selectList.selectedIndex < 2)
     {
         qualityList.disabled = false;
+
+        //? file size preview
+        if (selectList.selectedIndex == 0) {
+            document.querySelectorAll(".sizeWithoutAudio").forEach((elem: HTMLSpanElement)=>{
+                elem.style.display = "none"
+            })
+            document.querySelectorAll(".sizeWithAudio").forEach((elem: HTMLSpanElement)=>{
+                elem.style.display = "initial"
+            })
+        }else{
+            document.querySelectorAll(".sizeWithoutAudio").forEach((elem: HTMLSpanElement)=>{
+                elem.style.display = "initial"
+            })
+            document.querySelectorAll(".sizeWithAudio").forEach((elem: HTMLSpanElement)=>{
+                elem.style.display = "none"
+            })
+        }
     } else
     {
         qualityList.disabled = true;
@@ -177,42 +222,65 @@ selectList.listen("MDCSelect:change", () =>
 });
 
 var isHandling = false;
-var qualityLabel = qualityList.root.querySelector(".mdc-select__selected-text") as HTMLSpanElement
+var qualityLabel = qualityList.root.querySelector(".mdc-select__selected-text") as HTMLSpanElement;
 qualityLabel.addEventListener("DOMSubtreeModified", () =>
 {
-    if (isHandling) {
-        return
+    if (isHandling)
+    {
+        return;
     }
     isHandling = true;
-    var curVal = qualityList.value.split(":")
-    var fps = curVal[2]
-    var hdr = curVal[3]
+    var curVal = qualityList.value.split(":");
+    var fps = curVal[2];
+    var hdr = curVal[3];
 
-    console.log(qualityList.value);
-    qualityLabel.innerHTML += ` ${fps}fps`
-    if (hdr == "true") {
-        qualityLabel.innerHTML += ` HDR`
+    qualityLabel.innerHTML += ` ${fps}fps`;
+    if (hdr == "true")
+    {
+        qualityLabel.innerHTML += ` HDR`;
     }
     isHandling = false;
 });
 
-electron.onPercent((_ev, percent: number) =>
+var secondPage = localStorage.getItem("page") == "1" || false;
+var wrapper = document.querySelector("#wrapper") as HTMLDivElement;
+topAppBar.listen("MDCTabBar:activated", (ev) =>
+{
+    secondPage = !secondPage;
+    localStorage.setItem("page", secondPage ? "1" : "0");
+    wrapper.classList.toggle("slide");
+});
+if (secondPage == true)
+{
+    //? Avoid the transition
+    var transition = wrapper.style.transition;
+    wrapper.style.transition = "unset";
+
+    secondPage = !secondPage;
+    localStorage.setItem("page", "1");
+    (document.querySelector(".mdc-tab:nth-of-type(2)") as HTMLButtonElement).click();
+    setTimeout(() =>
+    {
+        wrapper.style.transition = transition;
+    }, 0);
+}
+
+downloader.onPercent((_ev, percent: number) =>
 {
     progress.determinate = true;
     progress.progress = percent / 100;
 });
 
-electron.barDeterminate((ev, isIndeterminate) =>
+downloader.barDeterminate((ev, isIndeterminate) =>
 {
     progress.determinate = !isIndeterminate;
 });
 
 
-electron.doneDownload((_ev, wasSuccess: boolean) =>
+downloader.doneDownload((_ev, wasSuccess: boolean) =>
 {
     if (wasSuccess)
     {
-        document.querySelector("#FileSystem").innerHTML = os == "darwin" ? "Finder" : "File Explorer";
         endMsg.open();
     }
     downloadButton.disabled = false;
@@ -231,6 +299,14 @@ function download (): void
     selectList.disabled = true;
     qualityList.disabled = true;
 
-    electron.download(url, selectList.value, qualityList.value);
-    console.log(qualityList.value);
+    downloader.download(url, selectList.value, qualityList.value);
+}
+
+function bytesToSize (bytes: number)
+{
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes == 0) return '0 Byte';
+    var i = Math.floor(Math.log(bytes) / Math.log(1024));
+    var bytesWorded = (bytes / Math.pow(1024, i));
+    return bytesWorded.toFixed(bytesWorded >= 100 ? 1 : 2) + ' ' + sizes[i];
 }

@@ -2,8 +2,9 @@
 const { contextBridge, ipcRenderer, clipboard } = require('electron');
 const { validateURL, getBasicInfo } = require("ytdl-core");
 
+
 contextBridge.exposeInMainWorld(
-    'electron',
+    'downloader',
     {
         validateURL,
         getBasicInfo,
@@ -12,13 +13,16 @@ contextBridge.exposeInMainWorld(
         doneDownload: (ev) => { ipcRenderer.on("doneDownload", ev); },
         onClipboard: (ev) => { ipcRenderer.on("clipboardChange", ev); },
         dialogResponse: (res) => ipcRenderer.send("doneDialogRes", res),
-        barDeterminate: (func)=>{ipcRenderer.on("barIndeterminate", func)},
-        getFormats: (url) =>{
-            return new Promise((resolve, reject) => {
-                ipcRenderer.send("getFormats", url)
-                ipcRenderer.on("vidFormats", (ev, formats)=>{
-                    resolve(formats)
-                })
+        barDeterminate: (func) => { ipcRenderer.on("barIndeterminate", func); },
+        getFormats: (url) =>
+        {
+            return new Promise((resolve, reject) =>
+            {
+                ipcRenderer.send("getFormats", url);
+                ipcRenderer.on("vidFormats", (ev, formats) =>
+                {
+                    resolve(formats);
+                });
             });
         }
     }
@@ -40,3 +44,21 @@ ipcRenderer.on("getHeight", ev =>
         ev.sender.send("resize", document.body.clientHeight - 32);
     }
 });
+
+contextBridge.exposeInMainWorld(
+    'converter',
+    {
+        openVideo: () => { ipcRenderer.send("openVideo"); },
+        openVideoDirect: (path) => { ipcRenderer.send("openVideo", path); },
+        onVideoData: (func) =>
+        {
+            ipcRenderer.on("gotVideo", (ev, file) =>
+            {
+                func(file);
+            });
+        },
+        convertVideo: (url, format) => { ipcRenderer.send("convertVideo", url, format); },
+        onProgress: (ev) => { ipcRenderer.on("convertProgress", ev); },
+        onDoneConvert: (ev) => { ipcRenderer.on("convertDone", ev); },
+    }
+);

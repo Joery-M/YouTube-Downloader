@@ -1,5 +1,5 @@
 const { BrowserWindow, dialog, ipcMain, shell } = require('electron');
-const { doneDownload, sendPercent, ffmpegPath, ffprobePath } = require("../index");
+const { doneDownload, sendPercent, ffmpegPath } = require("../index");
 // External modules
 const ytdl = require('ytdl-core');
 const YTDlpWrap = require('yt-dlp-wrap').default;

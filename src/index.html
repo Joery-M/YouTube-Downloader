@@ -12,108 +12,193 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </head>
     <body style="opacity: 0; overflow-y: hidden;">
-        <main>
-            <label class="mdc-text-field mdc-text-field--filled" id="ytLink">
-                <span class="mdc-floating-label">Video URL</span>
-                <input class="mdc-text-field__input" type="text"/>
-                <span class="mdc-line-ripple mdc-label"></span>
-            </label>
-            <div id="iframe">
-                <div class="mdc-circular-progress" style="width: 48px; height: 48px" role="progressbar" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1">
-                    <div class="mdc-circular-progress__determinate-container">
-                        <svg class="mdc-circular-progress__determinate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                            <circle class="mdc-circular-progress__determinate-track" cx="24" cy="24" r="18" stroke-width="4"/>
-                            <circle class="mdc-circular-progress__determinate-circle" cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="113.097" stroke-width="4"/>
-                        </svg>
-                    </div>
-                    <div class="mdc-circular-progress__indeterminate-container">
-                        <div class="mdc-circular-progress__spinner-layer">
-                            <div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-left">
-                                <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549" stroke-width="4"/>
-                                </svg>
-                            </div>
-                            <div class="mdc-circular-progress__gap-patch">
-                                <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549" stroke-width="3.2"/>
-                                </svg>
-                            </div>
-                            <div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-right">
-                                <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549" stroke-width="4"/>
-                                </svg>
+        <div id="fileCatcher"></div>
+        <header class="mdc-top-app-bar">
+            <div class="mdc-top-app-bar__row">
+                <div class="mdc-tab-bar mdc-tab-bar" role="tablist">
+                    <div class="mdc-tab-scroller">
+                        <div class="mdc-tab-scroller__scroll-area">
+                            <div class="mdc-tab-scroller__scroll-content">
+                                <button class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="0">
+                                    <span class="mdc-tab__content">
+                                        <span class="mdc-tab__text-label">Download</span>
+                                    </span>
+                                    <span class="mdc-tab-indicator mdc-tab-indicator--active">
+                                        <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                    </span>
+                                    <span class="mdc-tab__ripple"></span>
+                                </button>
+                                <button class="mdc-tab" role="tab" aria-selected="false" tabindex="0">
+                                    <span class="mdc-tab__content">
+                                        <span class="mdc-tab__text-label">Convert</span>
+                                    </span>
+                                    <span class="mdc-tab-indicator">
+                                        <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+                                    </span>
+                                    <span class="mdc-tab__ripple"></span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <iframe src="" frameborder="0" id="preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
             </div>
-            <div id="downloadOptions">
-                <div>
-					<div class="mdc-select mdc-select--filled demo-width-class" id="downloadType">
-						<div class="mdc-select__anchor" role="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="demo-label demo-selected-text">
-							<span id="demo-label" class="mdc-floating-label">Pick a download type</span>
-							<span class="mdc-select__selected-text-container">
-								<span id="demo-selected-text" class="mdc-select__selected-text"></span>
-							</span>
-							<span class="mdc-select__dropdown-icon">
-								<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
-									<polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
-									<polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
-								</svg>
-							</span>
-							<span class="mdc-line-ripple"></span>
-						</div>
-						<div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
-							<ul class="mdc-list" role="listbox" aria-label="Video download type">
-								<li class="mdc-list-item mdc-list-item--selected" aria-selected="false" data-value="videoAudio" role="option">
-									<span class="mdc-list-item__ripple"></span>
-									<span class="mdc-list-item__text">Video + Audio</span>
-								</li>
-								<li class="mdc-list-item" aria-selected="false" data-value="videoOnly" role="option">
-									<span class="mdc-list-item__ripple"></span>
-									<span class="mdc-list-item__text">Video only</span>
-								</li>
-								<li class="mdc-list-item" aria-selected="false" data-value="audioOnly" role="option">
-									<span class="mdc-list-item__ripple"></span>
-									<span class="mdc-list-item__text">Audio only</span>
-								</li>
-							</ul>
-						</div>
-					</div>
-					<div class="mdc-select mdc-select--filled demo-width-class" id="qualityType">
-						<div class="mdc-select__anchor" role="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="demo-label">
-							<span class="mdc-floating-label">Video quality</span>
-							<span class="mdc-select__selected-text-container">
-								<span class="mdc-select__selected-text"></span>
-							</span>
-							<span class="mdc-select__dropdown-icon">
-								<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
-									<polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
-									<polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
-								</svg>
-							</span>
-							<span class="mdc-line-ripple"></span>
-						</div>
-						<div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
-							<ul class="mdc-list" role="listbox" aria-label="Video quality">
-							</ul>
-						</div>
-					</div>
-				</div>
-                <br/>
-                <button class="mdc-button mdc-button--unelevated" id="downloadButton" disabled="disabled">
-                    <div class="mdc-button__ripple"></div>
-                    <span class="mdc-button__label">Download</span>
-                </button>
-                <br/>
-                <div id="progressBar" class="mdc-linear-progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                    <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
-                        <span class="mdc-linear-progress__bar-inner"></span>
+        </header>
+        <div id="wrapper">
+            <main id="downloadPage">
+                <label class="mdc-text-field mdc-text-field--filled" id="ytLink">
+                    <span class="mdc-floating-label">Video URL</span>
+                    <input class="mdc-text-field__input" type="text"/>
+                    <span class="mdc-line-ripple mdc-label"></span>
+                </label>
+                <div id="iframe">
+                    <div class="mdc-circular-progress" style="width: 48px; height: 48px" role="progressbar" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1">
+                        <div class="mdc-circular-progress__determinate-container">
+                            <svg class="mdc-circular-progress__determinate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <circle class="mdc-circular-progress__determinate-track" cx="24" cy="24" r="18" stroke-width="4"/>
+                                <circle class="mdc-circular-progress__determinate-circle" cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="113.097" stroke-width="4"/>
+                            </svg>
+                        </div>
+                        <div class="mdc-circular-progress__indeterminate-container">
+                            <div class="mdc-circular-progress__spinner-layer">
+                                <div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-left">
+                                    <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549" stroke-width="4"/>
+                                    </svg>
+                                </div>
+                                <div class="mdc-circular-progress__gap-patch">
+                                    <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549" stroke-width="3.2"/>
+                                    </svg>
+                                </div>
+                                <div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-right">
+                                    <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="24" cy="24" r="18" stroke-dasharray="113.097" stroke-dashoffset="56.549" stroke-width="4"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <iframe src="" frameborder="0" id="preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                </div>
+                <div id="downloadOptions">
+                    <div>
+                        <div class="mdc-select mdc-select--filled demo-width-class" id="downloadType">
+                            <div class="mdc-select__anchor" role="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="demo-label demo-selected-text">
+                                <span id="demo-label" class="mdc-floating-label">Pick a download type</span>
+                                <span class="mdc-select__selected-text-container">
+                                    <span id="demo-selected-text" class="mdc-select__selected-text"></span>
+                                </span>
+                                <span class="mdc-select__dropdown-icon">
+                                    <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+                                        <polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+                                        <polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+                                    </svg>
+                                </span>
+                                <span class="mdc-line-ripple"></span>
+                            </div>
+                            <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
+                                <ul class="mdc-list" role="listbox" aria-label="Video download type">
+                                    <li class="mdc-list-item mdc-list-item--selected" aria-selected="false" data-value="videoAudio" role="option">
+                                        <span class="mdc-list-item__ripple"></span>
+                                        <span class="mdc-list-item__text">Video + Audio</span>
+                                    </li>
+                                    <li class="mdc-list-item" aria-selected="false" data-value="videoOnly" role="option">
+                                        <span class="mdc-list-item__ripple"></span>
+                                        <span class="mdc-list-item__text">Video only</span>
+                                    </li>
+                                    <li class="mdc-list-item" aria-selected="false" data-value="audioOnly" role="option">
+                                        <span class="mdc-list-item__ripple"></span>
+                                        <span class="mdc-list-item__text">Audio only</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mdc-select mdc-select--filled demo-width-class" id="qualityType">
+                            <div class="mdc-select__anchor" role="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="demo-label">
+                                <span class="mdc-floating-label">Video quality</span>
+                                <span class="mdc-select__selected-text-container">
+                                    <span class="mdc-select__selected-text"></span>
+                                </span>
+                                <span class="mdc-select__dropdown-icon">
+                                    <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+                                        <polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+                                        <polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+                                    </svg>
+                                </span>
+                                <span class="mdc-line-ripple"></span>
+                            </div>
+                            <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
+                                <ul class="mdc-list" role="listbox" aria-label="Video quality"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <button class="mdc-button mdc-button--unelevated" id="downloadButton" disabled="disabled">
+                        <div class="mdc-button__ripple"></div>
+                        <span class="mdc-button__label">Download</span>
+                    </button>
+                    <br/>
+                    <div id="progressBar" class="mdc-linear-progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+                            <span class="mdc-linear-progress__bar-inner"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </main>
+            <main id="convertPage">
+                <div>
+                    <video id="previewVid" controls="controls" controlsList="nodownload noremoteplayback nofullscreen noplaybackrate" disablepictureinpicture="disablepictureinpicture"></video>
+                    <button class="mdc-button mdc-button--unelevated" id="openVideo">
+                        <span class="mdc-button__ripple"></span>
+                        <span class="mdc-button__label">Open video</span>
+                    </button>
+                </div>
+                <div id="convertSettings">
+                    <div class="mdc-form-field">
+                        <div class="mdc-checkbox" id="audioCheck">
+                            <input type="checkbox" class="mdc-checkbox__native-control" id="checkbox-1"/>
+                            <div class="mdc-checkbox__background">
+                                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                                    <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                                </svg>
+                                <div class="mdc-checkbox__mixedmark"></div>
+                            </div>
+                            <div class="mdc-checkbox__ripple"></div>
+                        </div>
+                        <label for="checkbox-1">Audio</label>
+
+                        <div class="mdc-select mdc-select--filled demo-width-class" id="convertResolution">
+                            <div class="mdc-select__anchor" role="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="demo-label demo-selected-text">
+                                <span id="demo-label" class="mdc-floating-label">Resolution</span>
+                                <span class="mdc-select__selected-text-container">
+                                    <span id="demo-selected-text" class="mdc-select__selected-text"></span>
+                                </span>
+                                <span class="mdc-select__dropdown-icon">
+                                    <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+                                        <polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+                                        <polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+                                    </svg>
+                                </span>
+                                <span class="mdc-line-ripple"></span>
+                            </div>
+                            <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
+                                <ul class="mdc-list" role="listbox" aria-label="Video resolution">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="mdc-button mdc-button--unelevated" id="convertVideo">
+                        <span class="mdc-button__ripple"></span>
+                        <span class="mdc-button__label">Convert</span>
+                    </button>
+                    <div id="progressBarConvert" class="mdc-linear-progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="mdc-linear-progress__bar mdc-linear-progress__primary-bar">
+                            <span class="mdc-linear-progress__bar-inner"></span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
 
         <div class="mdc-dialog">
             <div class="mdc-dialog__container">
