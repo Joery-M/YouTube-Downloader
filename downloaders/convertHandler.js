@@ -100,9 +100,6 @@ ipcMain.on("convertVideo", async (ev, vidFile, options) =>
         if (process.platform == "win32" && hasNvidia)
         {
             converter.videoCodec(isHDR ? "hevc_nvenc" : "h264_nvenc");
-        } else if (process.platform == "darwin")
-        {
-            converter.videoCodec("h264_videotoolbox");
         } else
         {
             converter.videoCodec("libx264");
