@@ -3,6 +3,8 @@ import { MDCFormField } from '@material/form-field';
 import { MDCCheckbox } from '@material/checkbox';
 import { MDCSelect } from '@material/select';
 import { MDCLinearProgress } from "@material/linear-progress";
+import { MDCSlider } from '@material/slider';
+
 
 import { endMsg, tabBar } from './script';
 
@@ -14,6 +16,7 @@ const convertButtonRipple = new MDCRipple(document.querySelector('#convertVideo'
 const progress = new MDCLinearProgress(document.querySelector("#progressBarConvert"));
 const audioCheck = new MDCCheckbox(document.querySelector('#audioCheck'));
 const resolutionSelect = new MDCSelect(document.querySelector("#convertResolution"));
+const slider = new MDCSlider(document.querySelector('.mdc-slider'));
 const formField = new MDCFormField(document.querySelector('.mdc-form-field'));
 formField.input = audioCheck;
 
@@ -21,12 +24,19 @@ audioCheck.disabled = true;
 resolutionSelect.disabled = true;
 convertButtonRipple.disabled = true;
 convertButtonRipple.root.setAttribute("disabled", "");
+//@ts-ignore
+window.slider = slider;
+var GpuUsable = false
 
 interface videoInfo
 {
     path?: string;
     resolution: (number)[];
     audio: boolean;
+    encodeQuality?: number;
+    GPUusable?: boolean;
+    isHDR?: boolean;
+    fps?: number
 }
 interface Converter
 {
@@ -98,7 +108,7 @@ converter.onVideoData((file: videoInfo) =>
                 `
             <li class="mdc-list-item" aria-selected="false" data-value="${i == 0 ? -1 : res}" role="option">
                 <span class="mdc-list-item__ripple"></span>
-                <span class="mdc-list-item__text">${res}p</span>
+                <span class="mdc-list-item__text">${res}p ${file.fps}fps ${file.isHDR ? " HDR" : ""}</span>
                 ${subtext}
             </li>
             `;
@@ -113,6 +123,35 @@ converter.onVideoData((file: videoInfo) =>
 
         convertButtonRipple.disabled = false;
         convertButtonRipple.root.removeAttribute("disabled");
+
+        GpuUsable = file.GPUusable
+        if (file.GPUusable == false)
+        {
+            slider.setDisabled(false);
+        } else
+        {
+            slider.setDisabled(false);
+            //@ts-ignore
+            slider.foundation.setMax(3)
+            slider.setValue(2)
+            
+            var thumb = slider.root.querySelector(".mdc-slider__thumb") as HTMLDivElement
+            var transition = thumb.style.transition,
+                transform = thumb.style.transform,
+                left = thumb.style.left
+            
+            var leftComp = transform.replace("translateX(", "").replace(")", "")
+            thumb.style.left = "calc(50% - 24px - "+leftComp+")"
+            slider.root.style.width = "175px"
+            thumb.style.transition = "transform 0s ease"
+            slider.root.addEventListener('transitionend', ()=>{
+                thumb.style.left = left
+                slider.initialSyncWithDOM()
+                setTimeout(() => {
+                    thumb.style.transition = "transform 80ms ease"
+                }, 10);
+            }, {once: true})
+        }
     } else
     {
         openButtonRipple.disabled = false;
@@ -135,6 +174,7 @@ convertButtonRipple.listen("click", () =>
 
     resolutionSelect.disabled = true;
     audioCheck.disabled = true;
+    slider.setDisabled(true);
 
     var res: any[] = resolutionSelect.value.split(":");
     res.forEach((num, i) =>
@@ -146,7 +186,8 @@ convertButtonRipple.listen("click", () =>
 
     converter.convertVideo(videoElem.src, {
         audio: audioCheck.checked,
-        resolution: res
+        resolution: res,
+        encodeQuality: slider.getValue()
     });
 });
 
@@ -172,6 +213,10 @@ converter.onDoneConvert((_ev: any, wasSuccess: boolean) =>
 {
     if (wasSuccess)
     {
+        if (endMsg.root.querySelector("#KillMe")) {
+            endMsg.root.querySelector("#KillMe").remove()
+        }
+        endMsg.root.querySelector(".mdc-dialog__title").innerHTML = "Conversion done!"
         endMsg.open();
     }
 
@@ -181,6 +226,7 @@ converter.onDoneConvert((_ev: any, wasSuccess: boolean) =>
     convertButtonRipple.root.removeAttribute("disabled");
     resolutionSelect.disabled = false;
     audioCheck.disabled = false;
+    slider.setDisabled(false);
 
     progress.progress = 0;
     videoElem.currentTime = 0;
@@ -230,4 +276,45 @@ document.addEventListener("DOMContentLoaded", () =>
             converter.openVideoDirect(path);
         }
     });
-});
+
+    //? init slider
+    slider.initialSyncWithDOM();
+    slider.setDisabled(true);
+
+    var textElem = slider.root.querySelector(".mdc-slider__value-indicator-text");
+    textElem.innerHTML = "Medium";
+    var observer = new MutationObserver((ev) =>
+    {
+        if (!parseFloat(ev[0].target.textContent))
+        {
+            return;
+        }
+        var text = "";
+        switch (parseFloat(ev[0].target.textContent))
+        {
+            case 1:
+                text = GpuUsable ? "Fast" : "Fastest";
+                break;
+            case 2:
+                text = GpuUsable ? "Medium" : "Faster";
+                break;
+            case 3:
+                text = GpuUsable ? "Slow" : "Fast";
+                break;
+            case 4:
+                text = "Medium";
+                break;
+            case 5:
+                text = "Slow";
+                break;
+            case 6:
+                text = "Slower";
+                break;
+            case 7:
+                text = "Slowest";
+                break;
+        }
+        textElem.innerHTML = text;
+    });
+    observer.observe(textElem, { childList: true });
+})

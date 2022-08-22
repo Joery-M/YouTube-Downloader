@@ -25,11 +25,10 @@ clipboardListener.startListening();
 
 function createWindow ()
 {
-
     var win = new BrowserWindow({
         width: 800,
         height: 652,
-        minHeight: 550,
+        minHeight: 566,
         maximizable: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),

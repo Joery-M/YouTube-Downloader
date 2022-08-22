@@ -60,10 +60,17 @@ module.exports = async function download (url, quality)
             if (!win.isFocused())
             {
                 win.flashFrame(true);
+                setTimeout(() => {
+                    win.flashFrame(false)
+                }, 2000);
             }
 
             ipcMain.once("doneDialogRes", (ev, res) =>
             {
+                if (res == "OpenVid") {
+                    win.webContents.send("openVideo", fileName)
+                    return
+                }
                 if (res)
                 {
                     shell.showItemInFolder(fileName);

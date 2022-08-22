@@ -78,6 +78,9 @@ module.exports = async function download (url)
             if (!win.isFocused())
             {
                 win.flashFrame(true);
+                setTimeout(() => {
+                    win.flashFrame(false)
+                }, 2000);
             }
 
             ipcMain.once("doneDialogRes", (ev, res) =>

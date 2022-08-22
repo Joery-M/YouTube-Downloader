@@ -86,6 +86,12 @@ downloadButton.addEventListener("click", download);
 export const endMsg = new MDCDialog(document.querySelector('.mdc-dialog'));
 endMsg.listen("MDCDialog:closing", (ev: MDCDialogCloseEvent) =>
 {
+    if (ev.detail.action == "OpenVid") {
+        downloader.dialogResponse("OpenVid")
+        endMsg.close()
+        tabBar.activateTab(1);
+        return
+    }
     downloader.dialogResponse(ev.detail.action == "accept");
 });
 
@@ -281,6 +287,24 @@ downloader.doneDownload((_ev, wasSuccess: boolean) =>
 {
     if (wasSuccess)
     {
+        if (!endMsg.root.querySelector("#KillMe")) {
+            endMsg.root.querySelector(".mdc-dialog__title").innerHTML = "Download done!"
+            var openConvertButton = document.createElement("button")
+            openConvertButton.classList.add("mdc-button", "mdc-dialog__button", "mdc-ripple-upgraded")
+            openConvertButton.id = "KillMe"
+            openConvertButton.setAttribute("data-mdc-dialog-action", "OpenVid")
+            openConvertButton.innerHTML =`
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">
+            Open in converter
+            </span>`
+            endMsg.root.querySelector(".mdc-dialog__actions").insertBefore(openConvertButton, endMsg.root.querySelector(".mdc-dialog__actions").children[0])
+        }
+        if (selectList.value == "audioOnly") {
+            if (endMsg.root.querySelector("#KillMe")) {
+                endMsg.root.querySelector("#KillMe").remove()
+            }
+        }
         endMsg.open();
     }
     downloadButton.disabled = false;
@@ -304,7 +328,7 @@ function download (): void
 
 function bytesToSize (bytes: number)
 {
-    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', "EB"];
     if (bytes == 0) return '0 Byte';
     var i = Math.floor(Math.log(bytes) / Math.log(1024));
     var bytesWorded = (bytes / Math.pow(1024, i));

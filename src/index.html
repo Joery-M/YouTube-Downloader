@@ -154,6 +154,25 @@
                     </button>
                 </div>
                 <div id="convertSettings">
+                    <div class="mdc-slider mdc-slider--discrete">
+                        <input class="mdc-slider__input" type="range" min="1" max="7" value="4" name="quality" step="1" aria-label="Discrete slider demo"/>
+                        <div class="mdc-slider__track">
+                            <div class="mdc-slider__track--inactive"></div>
+                            <div class="mdc-slider__track--active">
+                                <div class="mdc-slider__track--active_fill"></div>
+                            </div>
+                        </div>
+                        <div class="mdc-slider__thumb">
+                            <div class="mdc-slider__value-indicator-container" aria-hidden="true">
+                                <div class="mdc-slider__value-indicator">
+                                    <span class="mdc-slider__value-indicator-text">
+                                        50
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mdc-slider__thumb-knob"></div>
+                        </div>
+                    </div>
                     <div class="mdc-form-field">
                         <div class="mdc-checkbox" id="audioCheck">
                             <input type="checkbox" class="mdc-checkbox__native-control" id="checkbox-1"/>
@@ -182,8 +201,7 @@
                                 <span class="mdc-line-ripple"></span>
                             </div>
                             <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
-                                <ul class="mdc-list" role="listbox" aria-label="Video resolution">
-                                </ul>
+                                <ul class="mdc-list" role="listbox" aria-label="Video resolution"></ul>
                             </div>
                         </div>
                     </div>

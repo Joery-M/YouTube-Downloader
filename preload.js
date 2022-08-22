@@ -62,3 +62,7 @@ contextBridge.exposeInMainWorld(
         onDoneConvert: (ev) => { ipcRenderer.on("convertDone", ev); },
     }
 );
+
+ipcRenderer.on("openVideo", (ev, data)=>{
+    ipcRenderer.send("openVideo", data)
+})

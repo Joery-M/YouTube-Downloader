@@ -15,7 +15,8 @@
 @use "@material/list/mdc-list";
 @use "@material/menu-surface/mdc-menu-surface";
 @use "@material/menu/mdc-menu";
-@use "@material/select/styles";
+@use "@material/select/_select.scss";
+@use "@material/slider/_slider.scss";
 
 //? Tabs
 @use "@material/tab-bar/mdc-tab-bar";
@@ -27,6 +28,8 @@
 
 @include checkbox.core-styles;
 @include form-field.core-styles;
+@include select.core-styles;
+@include slider.core-styles;
 
 .mdc-dialog__button {
     --mdc-theme-primary: #202124;
@@ -94,5 +97,15 @@
     padding-left: 0.5em;
     &:last-of-type{
         margin-left: auto;
+    }
+}
+
+.mdc-slider{
+    width: 250px;
+
+    transition: 80ms width ease;
+
+    .mdc-slider__value-indicator {
+        opacity: 1 !important;
     }
 }
