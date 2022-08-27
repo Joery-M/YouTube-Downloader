@@ -246,17 +246,24 @@ function testGPU (url, isHDR)
         const stream = new Stream.Writable();
         stream._write = stream.write;
         ffmpeg(url)
-            .inputOptions(["-t", "0.1", /* "-hwaccel", "cuvid",  */"-c:v", "vp9_cuvid"])
+            .inputOptions(["-t", "0.01",/* "-hwaccel", "cuvid",  */"-c:v", "vp9_cuvid"])
             .videoCodec(isHDR ? "hevc_nvenc" : "h264_nvenc")
             .addOptions(isHDR ? ["-pix_fmt", "yuv420p10le"] : [])
             .on("end", (...args) =>
             {
+                console.log("b");
                 resolve(true);
                 stream.destroy();
             })
             .on("error", (...args) =>
             {
                 resolve(false);
+                stream.destroy();
+            })
+            .on("progress", (...args) =>
+            {
+                console.log("a");
+                resolve(true);
                 stream.destroy();
             })
             .format("avi")

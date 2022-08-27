@@ -26,7 +26,7 @@ convertButtonRipple.disabled = true;
 convertButtonRipple.root.setAttribute("disabled", "");
 //@ts-ignore
 window.slider = slider;
-var GpuUsable = false
+var GpuUsable = false;
 
 interface videoInfo
 {
@@ -36,7 +36,7 @@ interface videoInfo
     encodeQuality?: number;
     GPUusable?: boolean;
     isHDR?: boolean;
-    fps?: number
+    fps?: number;
 }
 interface Converter
 {
@@ -124,7 +124,7 @@ converter.onVideoData((file: videoInfo) =>
         convertButtonRipple.disabled = false;
         convertButtonRipple.root.removeAttribute("disabled");
 
-        GpuUsable = file.GPUusable
+        GpuUsable = file.GPUusable;
         if (file.GPUusable == false)
         {
             slider.setDisabled(false);
@@ -132,25 +132,27 @@ converter.onVideoData((file: videoInfo) =>
         {
             slider.setDisabled(false);
             //@ts-ignore
-            slider.foundation.setMax(3)
-            slider.setValue(2)
-            
-            var thumb = slider.root.querySelector(".mdc-slider__thumb") as HTMLDivElement
+            slider.foundation.setMax(3);
+            slider.setValue(2);
+
+            var thumb = slider.root.querySelector(".mdc-slider__thumb") as HTMLDivElement;
             var transition = thumb.style.transition,
                 transform = thumb.style.transform,
-                left = thumb.style.left
-            
-            var leftComp = transform.replace("translateX(", "").replace(")", "")
-            thumb.style.left = "calc(50% - 24px - "+leftComp+")"
-            slider.root.style.width = "175px"
-            thumb.style.transition = "transform 0s ease"
-            slider.root.addEventListener('transitionend', ()=>{
-                thumb.style.left = left
-                slider.initialSyncWithDOM()
-                setTimeout(() => {
-                    thumb.style.transition = "transform 80ms ease"
+                left = thumb.style.left;
+
+            var leftComp = transform.replace("translateX(", "").replace(")", "");
+            thumb.style.left = "calc(50% - 24px - " + leftComp + ")";
+            slider.root.style.width = "175px";
+            thumb.style.transition = "transform 0s ease";
+            slider.root.addEventListener('transitionend', () =>
+            {
+                thumb.style.left = left;
+                slider.initialSyncWithDOM();
+                setTimeout(() =>
+                {
+                    thumb.style.transition = "transform 80ms ease";
                 }, 10);
-            }, {once: true})
+            }, { once: true });
         }
     } else
     {
@@ -198,6 +200,7 @@ converter.onProgress((_ev: any, percent: number, frame: number, fps: number) =>
     progress.progress = percent / 100;
 
     videoElem.controls = false;
+    videoElem.pause();
     if (frameLoaded)
     {
         frameLoaded = false;
@@ -213,10 +216,11 @@ converter.onDoneConvert((_ev: any, wasSuccess: boolean) =>
 {
     if (wasSuccess)
     {
-        if (endMsg.root.querySelector("#KillMe")) {
-            endMsg.root.querySelector("#KillMe").remove()
+        if (endMsg.root.querySelector("#KillMe"))
+        {
+            endMsg.root.querySelector("#KillMe").remove();
         }
-        endMsg.root.querySelector(".mdc-dialog__title").innerHTML = "Conversion done!"
+        endMsg.root.querySelector(".mdc-dialog__title").innerHTML = "Conversion done!";
         endMsg.open();
     }
 
@@ -317,4 +321,4 @@ document.addEventListener("DOMContentLoaded", () =>
         textElem.innerHTML = text;
     });
     observer.observe(textElem, { childList: true });
-})
+});

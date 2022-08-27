@@ -24,7 +24,7 @@ module.exports = async function download (url)
 
     var fileName = dialog.showSaveDialogSync(win, {
         title: 'Download to File…',
-        defaultPath: videoName.replace(/[/\\?%*:|"<>]/g, '-').replace(/\./g, ""),
+        defaultPath: videoName.replace(/[/\\?%*:|"<>]/g, '-').replace(/[\.…]/g, ""),
         filters: [
             { name: "mp3", extensions: ["mp3"] },
             { name: "wav", extensions: ["wav"] },
