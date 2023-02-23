@@ -252,8 +252,11 @@ document.addEventListener("DOMContentLoaded", () =>
         {
             dropzone.classList.add("droppable");
             dropzone.style.pointerEvents = "all";
+            ev.dataTransfer.dropEffect = "link"
 
             clearTimeout(dragTimer);
+        }else {
+            ev.dataTransfer.dropEffect = "none"
         }
     });
 
@@ -276,6 +279,7 @@ document.addEventListener("DOMContentLoaded", () =>
             dropzone.classList.remove("droppable");
             tabBar.activateTab(1);
 
+            //@ts-ignore it works
             var path = ev.dataTransfer.items[0].getAsFile().path;
             converter.openVideoDirect(path);
         }

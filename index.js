@@ -113,7 +113,39 @@ if (!gotTheLock)
                 console.log(err.statusMessage);
                 dialog.showErrorBox("An error occured downloading yt-dlp!", err.statusCode + ": " + err.statusMessage);
             });
+        }else {
+            // Check version if yt-dlp needs updating
+            var dlp = new YTDlpWrap(path.join(process.resourcesPath, "./yt-dlp" + ext))
+
+            YTDlpWrap.getGithubReleases(1, 1).then(async (versions) => {
+                const remoteVersion = versions[0].tag_name.replace(/[^A-z0-9.]/g, "")
+                const localVersion = (await dlp.getVersion()).replace(/[^A-z0-9.]/g, "")
+
+                if (remoteVersion !== localVersion) {
+                    YTDlpWrap.downloadFromGithub(path.join(process.resourcesPath, "./yt-dlp" + ext)).then(() =>
+                    {
+                        dialog.showMessageBox(BrowserWindow.getAllWindows()[0], {
+                            title: "Restart required.",
+                            message:
+                            "The YouTube downloader used internally has updated, would you like to restart the application?\n\n" +
+                            "A non-updated version may result in videos not being able to download.",
+                            buttons: ["OK", "Continue without update"],
+                            noLink: true
+                        }).then((val) => {
+                            if (val.response == 0) {
+                                app.quit()
+                                app.relaunch()
+                            }
+                        })
+                    }).catch((err) =>
+                    {
+                        console.log(err.statusMessage);
+                        dialog.showErrorBox("An error occured downloading yt-dlp!", err.statusCode + ": " + err.statusMessage);
+                    });
+                }
+            })
         }
+        
 
         app.on('activate', () =>
         {

@@ -251,7 +251,6 @@ function testGPU (url, isHDR)
             .addOptions(isHDR ? ["-pix_fmt", "yuv420p10le"] : [])
             .on("end", (...args) =>
             {
-                console.log("b");
                 resolve(true);
                 stream.destroy();
             })
@@ -262,7 +261,6 @@ function testGPU (url, isHDR)
             })
             .on("progress", (...args) =>
             {
-                console.log("a");
                 resolve(true);
                 stream.destroy();
             })
